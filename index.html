@@ -3,174 +3,257 @@
 <head>
   <meta charset="utf-8" />
   <meta name="viewport" content="width=device-width,initial-scale=1,maximum-scale=1,user-scalable=no" />
-  <title>Mobile Karaoke — Don Jose Guardo</title>
+  <title>🎬 Video with Controls + Slideshow</title>
   <style>
-    :root {
-      --bg:#0b0f14; --panel:#0f1720; --accent:#ff4757; --muted:#94a3b8; --glass:rgba(255,255,255,0.03);
-      --big:20vmin; --small:4vmin;
+    html,body {
+      height:100%;
+      margin:0;
+      background:#000;
+      font-family: system-ui, -apple-system, Segoe UI, Roboto, Arial, sans-serif;
+      color:#fff;
     }
-    html,body{height:100%;margin:0;font-family:system-ui,-apple-system,Segoe UI,Roboto,'Helvetica Neue',Arial;color:#fff;background:linear-gradient(180deg,#06111a 0%, #07121b 100%);-webkit-font-smoothing:antialiased}
-    .wrap{max-width:460px;margin:0 auto;height:100vh;display:flex;flex-direction:column}
+    .wrap {
+      max-width: 600px;
+      margin: 0 auto;
+      padding: 10px;
+    }
 
-    header{padding:14px 18px;display:flex;align-items:center;gap:12px}
-    .logo{width:44px;height:44px;border-radius:10px;background:linear-gradient(135deg,#0ea5a4,#7c3aed);display:flex;align-items:center;justify-content:center;font-weight:700}
-    h1{font-size:1.05rem;margin:0}
+    /* 🔝 Header */
+    header {
+      display:flex;
+      align-items:center;
+      justify-content: space-between;
+      padding:10px 0;
+    }
+    .logo {
+      width:44px;
+      height:44px;
+      border-radius:10px;
+      object-fit:cover;
+    }
+    .nav-home {
+      text-decoration: none;
+      color: #0af;
+      font-size: 0.95rem;
+      font-weight: 500;
+    }
+    h1 {
+      font-size:1rem;
+      margin:0;
+      flex:1;
+      text-align:center;
+    }
 
-    main{flex:1;padding:12px}
-    .player-card{background:var(--panel);border-radius:14px;padding:12px;box-shadow:0 6px 20px rgba(2,6,23,0.6);display:flex;flex-direction:column;gap:12px}
+    /* 🎬 Video */
+    .video-container {
+      position: relative;
+    }
+    video {
+      width: 100%;
+      height: auto;
+      max-height: 60vh;
+      border-radius: 14px;
+      background: #000;
+      object-fit: cover;
+      box-shadow: 0 8px 30px rgba(0,0,0,0.6);
+    }
 
-    .art{width:var(--big);height:var(--big);border-radius:50%;background-image:var(--art);background-size:cover;background-position:center;margin:0 auto;box-shadow:0 8px 30px rgba(2,6,23,0.6)}
+    /* 🔘 Controls inside player */
+    .controls {
+      position: absolute;
+      bottom: 10px;
+      right: 10px;
+      display: flex;
+      gap: 10px;
+    }
+    .btn {
+      background: rgba(0,0,0,0.6);
+      border: none;
+      border-radius: 50%;
+      width: 40px;
+      height: 40px;
+      color: #fff;
+      font-size: 18px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      cursor: pointer;
+      transition: background 0.3s;
+    }
+    .btn:hover {
+      background: rgba(0,0,0,0.8);
+    }
 
-    .controls{display:flex;align-items:center;justify-content:space-around;padding:6px}
-    button{background:var(--glass);border:0;padding:10px;border-radius:10px;color:inherit;font-size:1rem}
-    .play{font-size:1.4rem;padding:14px 18px;border-radius:999px}
+    /* 🔍 Search bar */
+    .search-bar {
+      margin-top: 12px;
+      display:flex;
+    }
+    .search-bar input {
+      flex:1;
+      padding:10px;
+      border-radius: 8px;
+      border:none;
+      font-size:1rem;
+    }
 
-    .progress-wrap{display:flex;flex-direction:column;gap:8px}
-    .time-row{display:flex;justify-content:space-between;font-size:0.82rem;color:var(--muted)}
-    .progress{height:8px;background:rgba(255,255,255,0.06);border-radius:999px;overflow:hidden}
-    .progress > i{display:block;height:100%;width:0%;background:linear-gradient(90deg,var(--accent),#ff8a65)}
+    /* 🖼 Slideshow */
+    .slideshow {
+      margin-top: 15px;
+      border-radius: 14px;
+      overflow: hidden;
+      position: relative;
+    }
+    .slide {
+      display: none;
+      width: 100%;
+      cursor: pointer;
+    }
+    .slide img {
+      width: 100%;
+      border-radius: 14px;
+      display: block;
+    }
+    .caption {
+      position: absolute;
+      bottom: 8px;
+      left: 0;
+      right: 0;
+      text-align: center;
+      background: rgba(0,0,0,0.5);
+      font-size: 0.9rem;
+      padding: 6px;
+    }
 
-    .lyrics{height:34vh;overflow:hidden;border-radius:10px;padding:10px;background:linear-gradient(180deg, rgba(255,255,255,0.02), transparent);backdrop-filter:blur(4px)}
-    .lines{height:100%;overflow:auto;padding-right:8px;scroll-behavior:smooth}
-    .line{padding:8px 6px;text-align:center;font-size:1.05rem;color:var(--muted)}
-    .line.active{color:var(--accent);font-weight:700;font-size:1.12rem}
+    /* 🔻 Footer */
+    footer {
+      text-align:center;
+      padding:12px;
+      font-size:0.9rem;
+      color:#aaa;
+    }
 
-    .meta-row{display:flex;align-items:center;justify-content:space-between;gap:8px}
-    .small{font-size:0.9rem;color:var(--muted)}
-    .slider{appearance:none;width:100%;height:28px}
-    button, .slider{touch-action:none}
-
-    footer{padding:12px;text-align:center;color:var(--muted);font-size:0.85rem}
-
+    /* 🚫 Block desktop */
     @media(min-width:900px){
-      .wrap{transform:scale(0.9);box-shadow:0 6px 30px rgba(0,0,0,0.6)}
-      #desktopBlock{display:flex !important;}
+      body::before {
+        content:"🚫 This app is for mobile devices only.\a\aPlease open on your phone.";
+        white-space:pre-line;
+        display:flex;
+        align-items:center;
+        justify-content:center;
+        height:100vh;
+        width:100%;
+        background:#000;
+        color:#fff;
+        font-size:1.2rem;
+        text-align:center;
+      }
+      .wrap { display:none; }
     }
   </style>
-<header>
-  <img src="images/logo.png" alt="Musify Logo" class="logo" />
-  <div>
-    <h1>Musify Karaoke</h1>
-    <div class="small">DJ Blayne Castello & Jorjan lanaja</div>
-  </div>
-</header>
+</head>
+<body>
+  <div class="wrap">
+    <!-- 🔝 Header -->
+    <header>
+      <img src="images/logo.png" alt="Logo" class="logo" />
+      <h1>Landscape Video</h1>
+      <a href="home.html" class="nav-home">🏠 Home</a>
+    </header>
 
+    <!-- 🎬 Video Player -->
+    <div class="video-container">
+      <video id="landscapeVideo" autoplay muted playsinline loop poster="images/poster.jpg">
+        <source src="videos/landscape_mobile.mp4" type="video/mp4">
+      </video>
 
-    <div id="desktopBlock" style="
-      position:fixed;inset:0;display:none;align-items:center;justify-content:center;
-      background:rgba(0,0,0,0.9);color:#fff;z-index:9999;text-align:center;
-      padding:20px;font-size:1.2rem;line-height:1.5">
-      🚫 This Karaoke app is for <b>mobile devices only</b>.<br><br>
-      Please open on your phone.
+      <!-- 🔊 & 📱 Controls inside player -->
+      <div class="controls">
+        <button class="btn" id="soundBtn">🔇</button>
+        <button class="btn" id="landscapeBtn">📱</button>
+      </div>
     </div>
 
-    <main>
-      <div class="player-card" id="playerCard">
-        <div class="art" id="art" style="--art: url('images/don-jose.jpg')"></div>
+    <!-- 🔍 Search bar -->
+    <div class="search-bar">
+      <input type="text" placeholder="Search videos..." />
+    </div>
 
-        <div class="progress-wrap">
-          <div class="time-row"><span id="curTime">0:00</span><span id="durTime">0:00</span></div>
-          <div class="progress" id="progressBar"><i id="progressFill"></i></div>
-        </div>
-
-        <div class="controls">
-          <button id="rew">⏮</button>
-          <button id="play" class="play">▶</button>
-          <button id="fwd">⏭</button>
-        </div>
-
-        <div class="meta-row">
-          <div class="small">Speed: <span id="speedVal">1.0x</span></div>
-          <div style="display:flex;gap:8px;align-items:center;width:60%">
-            <input id="speed" class="slider" type="range" min="50" max="150" value="100">
-          </div>
-        </div>
-
-        <div class="lyrics" id="lyricsBox">
-          <div class="lines" id="lines"></div>
-        </div>
+    <!-- 🖼 Temporary Song Slideshow -->
+    <div class="slideshow" id="slideshow">
+      <div class="slide" data-video="videos/cantilan_mobile.mp4">
+        <img src="images/cantilan.jpg" alt="Song 1">
+        <div class="caption">🎵 Cantilan by Zandro</div>
       </div>
-    </main>
+      <div class="slide" data-video="videos/surigao_full.mp4">
+        <img src="images/surigao.jpg" alt="Song 2">
+        <div class="caption">🎵 WSurigaonon by Zandro</div>
+      </div>
+      <div class="slide" data-video="videos/song3.mp4">
+        <img src="images/song3.jpg" alt="Song 3">
+        <div class="caption">🎵 Don Jose Guardo – Bridge</div>
+      </div>
+    </div>
 
+    <!-- 📝 Footer -->
     <footer>
-      <div class="small">Now playing: Don Jose Guardo</div>
+      "We make a living by what we get, but we make a life by what we give"
     </footer>
   </div>
 
   <script>
-    // --- Karaoke Engine ---
-    const audio = new Audio();
-    audio.preload = 'metadata';
+    const video = document.getElementById("landscapeVideo");
+    const soundBtn = document.getElementById("soundBtn");
+    const landscapeBtn = document.getElementById("landscapeBtn");
 
-    const playBtn = document.getElementById('play');
-    const rewBtn = document.getElementById('rew');
-    const fwdBtn = document.getElementById('fwd');
-    const curTime = document.getElementById('curTime');
-    const durTime = document.getElementById('durTime');
-    const progressFill = document.getElementById('progressFill');
-    const progressBar = document.getElementById('progressBar');
-    const linesEl = document.getElementById('lines');
-    const speed = document.getElementById('speed');
-    const speedVal = document.getElementById('speedVal');
-    const art = document.getElementById('art');
-
-    let cues = [];
-    let currentIndex = -1;
-
-    function fmt(t){ if (!isFinite(t)) return '0:00'; const m=Math.floor(t/60); const s=Math.floor(t%60); return m+':'+String(s).padStart(2,'0'); }
-
-    function parseLRC(text){
-      const lines = text.split(/\r?\n/).map(l=>l.trim()).filter(Boolean);
-      const out=[]; const timeRe=/\[(\d{1,2}):(\d{2}(?:\.\d{1,3})?)\]/g;
-      for(const l of lines){ let m; let last=0; const times=[]; while(m=timeRe.exec(l)){ const mm=parseInt(m[1],10); const ss=parseFloat(m[2]); times.push(mm*60+ss); last=timeRe.lastIndex;} const txt=l.slice(last).trim(); for(const t of times) out.push({time:t,text:txt}); }
-      out.sort((a,b)=>a.time-b.time); return out;
-    }
-
-    function renderCues(cues){
-      linesEl.innerHTML=''; cues.forEach((c,i)=>{const div=document.createElement('div');div.className='line';div.dataset.index=i;div.dataset.time=c.time;div.textContent=c.text||'...';div.addEventListener('click',()=>{audio.currentTime=c.time+0.01;sync();audio.play();});linesEl.appendChild(div);});
-    }
-
-    function findIndexAtTime(t){let idx=-1;for(let i=0;i<cues.length;i++){if(t>=cues[i].time) idx=i; else break;}return idx;}
-
-    function sync(){
-      const t=audio.currentTime; const d=audio.duration||0;
-      curTime.textContent=fmt(t); durTime.textContent=fmt(d);
-      const pct=d?(t/d*100):0; progressFill.style.width=pct+'%';
-      const idx=findIndexAtTime(t);
-      if(idx!==currentIndex){
-        const prev=linesEl.querySelector('.line.active'); if(prev) prev.classList.remove('active');
-        if(idx>=0){const el=linesEl.querySelector(`.line[data-index='${idx}']`); if(el){el.classList.add('active'); const top=el.offsetTop-linesEl.clientHeight/2+el.clientHeight/2; linesEl.scrollTo({top,behavior:'smooth'});} }
-        currentIndex=idx;
+    // 🔊 Sound toggle
+    soundBtn.addEventListener("click", () => {
+      if (video.muted) {
+        video.muted = false;
+        soundBtn.textContent = "🔊";
+      } else {
+        video.muted = true;
+        soundBtn.textContent = "🔇";
       }
-    }
-
-    playBtn.addEventListener('click',()=>{ if(audio.paused) audio.play(); else audio.pause(); });
-    rewBtn.addEventListener('click',()=>{ audio.currentTime=Math.max(0,audio.currentTime-10);sync(); });
-    fwdBtn.addEventListener('click',()=>{ audio.currentTime=Math.min((audio.duration||0),audio.currentTime+10);sync(); });
-
-    audio.addEventListener('play',()=>{ playBtn.textContent='⏸'; });
-    audio.addEventListener('pause',()=>{ playBtn.textContent='▶'; });
-    audio.addEventListener('timeupdate',()=>sync());
-    audio.addEventListener('loadedmetadata',()=>{ durTime.textContent=fmt(audio.duration); });
-
-    progressBar.addEventListener('click',e=>{const rect=progressBar.getBoundingClientRect();const x=e.clientX-rect.left;const pct=Math.max(0,Math.min(1,x/rect.width));if(audio.duration) audio.currentTime=audio.duration*pct;sync();});
-    speed.addEventListener('input',()=>{const v=Number(speed.value)/100;audio.playbackRate=v;speedVal.textContent=v.toFixed(2)+'x';});
-
-    async function loadSongFromFiles({ audioSrc, artwork, lrcPath }) {
-      const lrcText = await fetch(lrcPath).then(r=>r.text());
-      audio.src = audioSrc;
-      if (artwork) art.style.setProperty('--art', `url('${artwork}')`);
-      cues=parseLRC(lrcText); renderCues(cues); currentIndex=-1; audio.currentTime=0; sync();
-    }
-
-    // Load Don Jose Guardo by default
-    loadSongFromFiles({
-      audioSrc: "songs/don-jose.mp3",
-      artwork: "images/don-jose.jpg",
-      lrcPath: "lyrics/don-jose.lrc"
     });
 
-    window.karaoke = { loadSongFromFiles, audio, cues };
+    // 📱 Landscape fullscreen
+    landscapeBtn.addEventListener("click", async () => {
+      if (video.requestFullscreen) {
+        await video.requestFullscreen();
+      } else if (video.webkitRequestFullscreen) {
+        await video.webkitRequestFullscreen();
+      }
+      if (screen.orientation && screen.orientation.lock) {
+        try {
+          await screen.orientation.lock("landscape");
+        } catch (err) {
+          console.log("Orientation lock not supported", err);
+        }
+      }
+    });
+
+    // 🖼 Slideshow autoplay + click to play
+    let slideIndex = 0;
+    const slides = document.querySelectorAll(".slide");
+
+    function showSlides() {
+      slides.forEach(slide => slide.style.display = "none");
+      slideIndex++;
+      if (slideIndex > slides.length) { slideIndex = 1 }
+      slides[slideIndex-1].style.display = "block";
+      setTimeout(showSlides, 3000); // change every 3s
+    }
+    showSlides();
+
+    // 🎬 Click on slide loads video
+    slides.forEach(slide => {
+      slide.addEventListener("click", () => {
+        const newSrc = slide.dataset.video;
+        video.src = newSrc;
+        video.play();
+      });
+    });
   </script>
 </body>
 </html>
